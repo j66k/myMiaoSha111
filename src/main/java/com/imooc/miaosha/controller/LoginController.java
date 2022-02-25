@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 
+import javax.validation.Valid;
+
 /**
  * @Package: com.imooc.miaosha.controller
  * @ClassName: LoginController
@@ -36,27 +38,27 @@ public class LoginController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(LoginVo loginVo){
+    public Result<Boolean> doLogin(@Valid LoginVo loginVo){
 
         log.info(loginVo.toString());
 
         //先进行参数校验
-        String passInput = loginVo.getPassword();
-        String mobile = loginVo.getMobile();
-        //需要保证不为空，且满足格式要求
-        if(StringUtils.isEmpty(passInput)){
-            //为空则返回一个错误页面
-            return Result.error(CodeMsg.PASSWORD_EMPTY);
-        }
-        //判断手机号是否为空
-        if(StringUtils.isEmpty(mobile)){
-            //为空则返回一个错误页面
-            return Result.error(CodeMsg.MOBILE_EMPTY);
-        }
-        //下面判断格式是否符合要求
-        if(!ValidatorUtil.isMobile(mobile)){
-            return Result.error(CodeMsg.MOBILE_ERROR);
-        }
+//        String passInput = loginVo.getPassword();
+//        String mobile = loginVo.getMobile();
+//        //需要保证不为空，且满足格式要求
+//        if(StringUtils.isEmpty(passInput)){
+//            //为空则返回一个错误页面
+//            return Result.error(CodeMsg.PASSWORD_EMPTY);
+//        }
+//        //判断手机号是否为空
+//        if(StringUtils.isEmpty(mobile)){
+//            //为空则返回一个错误页面
+//            return Result.error(CodeMsg.MOBILE_EMPTY);
+//        }
+//        //下面判断格式是否符合要求
+//        if(!ValidatorUtil.isMobile(mobile)){
+//            return Result.error(CodeMsg.MOBILE_ERROR);
+//        }
         //完成上面的检验之后，准备进行登录
 
         CodeMsg cm = miaoshaUserService.login(loginVo);
