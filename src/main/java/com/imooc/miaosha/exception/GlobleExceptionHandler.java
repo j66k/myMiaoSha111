@@ -27,7 +27,12 @@ public class GlobleExceptionHandler {
     @ExceptionHandler(value = Exception.class)//拦截所有的异常
     public Result<String> exceptionHandler(HttpServletRequest request,Exception e){
 
-        if(e instanceof BindException){
+        if(e instanceof GlobleException){
+
+            //先强转
+            GlobleException ex = (GlobleException) e;
+            return Result.error(ex.getCm());
+        }else if(e instanceof BindException){
             //如果传入的异常是绑定类型的异常
             //进行强转
             BindException ex = (BindException)e;
