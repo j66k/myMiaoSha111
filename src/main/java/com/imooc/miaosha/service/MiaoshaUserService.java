@@ -3,11 +3,18 @@ package com.imooc.miaosha.service;
 import com.imooc.miaosha.dao.MiaoShaUserDao;
 import com.imooc.miaosha.domain.MiaoShaUser;
 import com.imooc.miaosha.exception.GlobleException;
+import com.imooc.miaosha.redis.MiaoshaUserKey;
+import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.util.MD5Util;
+import com.imooc.miaosha.util.UUIDUtil;
 import com.imooc.miaosha.vo.LoginVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Package: com.imooc.miaosha.service
@@ -19,6 +26,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MiaoshaUserService {
+    //用常量存放cookie的名字
+    public static final String COOKI_NAME_TOKEN = "token";
+
+    //引入redis 把信息存到redis缓存中
+    @Autowired
+    RedisService redisService;
+
 
     @Autowired
     private MiaoShaUserDao miaoShaUserDao;
@@ -27,7 +41,7 @@ public class MiaoshaUserService {
         return miaoShaUserDao.getById(id);
     }
 
-    public boolean login(LoginVo loginVo) {
+    public boolean login(HttpServletResponse response,LoginVo loginVo) {
         if (loginVo == null) {
             throw new GlobleException(CodeMsg.SERVER_ERROR) ;
         }
@@ -44,10 +58,41 @@ public class MiaoshaUserService {
         String dbPass = user.getPassword();//数据库中的密码
         String saltDB= user.getSalt();
         if(MD5Util.formPassToDBPass(formPass,saltDB).equals(dbPass)){//判断计算之后的密码和数据库中存的是不是相同
-
+            addCookie(response,user);//调用创建cookie的方法
             return true;//登录成功
         }else{
             throw new GlobleException(CodeMsg.PASSWORD_ERROR);
         }
+    }
+
+    public MiaoShaUser getByToken(HttpServletResponse response,String token) {
+        //先进行参数验证
+        if(StringUtils.isEmpty(token)){
+            return null;
+        }
+        //从redis数据库中取出
+        //直接返回
+        MiaoShaUser user =  redisService.get(MiaoshaUserKey.token,token,MiaoShaUser.class);
+        //延长有效期
+        //先判断用户是否为空，不为空才延长
+        if(user!=null){
+            addCookie(response,user);//生成一个新的cookie
+        }
+
+        return user;
+    }
+
+    //生成cookie的方法
+    private void addCookie(HttpServletResponse response,MiaoShaUser user){
+        //登陆成功，生成一个cookie
+        String token = UUIDUtil.uuid();//获取一个随机的uuid
+        //放到redis缓存中
+        redisService.set(MiaoshaUserKey.token,token,user);//前缀，key,value
+        //生成cookie
+        Cookie cookie = new Cookie(COOKI_NAME_TOKEN,token);
+        //设置cookie的有效期
+        cookie.setMaxAge(MiaoshaUserKey.token.expireSeconds());//cookie有效期和miaoshauserkey一样
+        cookie.setPath("/");//设置路径为根目录
+        response.addCookie(cookie);//把cookie放到response中
     }
 }
