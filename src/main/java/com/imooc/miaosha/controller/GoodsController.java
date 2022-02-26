@@ -36,17 +36,7 @@ public class GoodsController {
     RedisService redisService;
 
     @RequestMapping("/to_list")
-    public String list(HttpServletResponse response,Model model,
-                          @CookieValue(value = MiaoshaUserService.COOKI_NAME_TOKEN, required = false) String cookieToken
-                        , @RequestParam(value = MiaoshaUserService.COOKI_NAME_TOKEN, required = false) String paramToken
-    ) {
-        //先进行参数校验
-        if(StringUtils.isEmpty(cookieToken)&&StringUtils.isEmpty(paramToken)){
-            return "login";//参数缺失，回到登陆页面
-        }
-        //做一个优先级判断，如果参数token为空，则直接用cookietoken
-        String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
-        MiaoShaUser user = userService.getByToken(response,token);
+    public String list(Model model, MiaoShaUser user) {
         model.addAttribute("user", user);//往里面加
         return "goods_list";//返回页面
     }
