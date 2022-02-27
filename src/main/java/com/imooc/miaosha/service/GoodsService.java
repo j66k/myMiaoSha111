@@ -1,6 +1,8 @@
 package com.imooc.miaosha.service;
 
 import com.imooc.miaosha.dao.GoodsDao;
+import com.imooc.miaosha.domain.Goods;
+import com.imooc.miaosha.domain.MiaoshaGoods;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,5 +31,13 @@ public class GoodsService {
     //查出对应的id的商品
     public GoodsVo getGoodsVoByGoodsId(long goodsId) {
         return goodsDao.getGoodsVoByGoodsId(goodsId);
+    }
+
+    //减小库存的方法
+    public void reduceStock(GoodsVo goods) {
+        MiaoshaGoods g = new MiaoshaGoods();
+        g.setGoodsId(goods.getId());
+        goodsDao.reduceStock(g);//调用dao中的方法修改库存，传入商品对象
+
     }
 }
