@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>商品详情</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
@@ -32,38 +32,75 @@
         </tr>
         <tr>
             <td>商品图片</td>
-            <td colspan="3"><img th:src="@{${goods.goodsImg}}" width="200" height="200" /></td>
+            <td colspan="3"><img th:src="@{${goods.goodsImg}}" width="200" height="200"/></td>
         </tr>
         <tr>
             <td th:text="${#dates.format(goods.startDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td ></td>
+            <td></td>
             <td id="miaoshaTip">
-                <span th:if="miaoshaStatus==0">秒杀倒计时:<span id="countDown"></span>秒</span>
-                <span th:if="miaoshaStatus==1">秒杀进行中</span>
-                <span th:if="miaoshaStatus==2">秒杀已经结束</span>
+                <input type="hidden" id="remainSeconds" th:value="${remainSeconds}"/>
+                <span th:if="${miaoshaStatus eq 0}">秒杀倒计时:<span id="countDown" th:text="${remainSeconds}"></span>秒</span>
+                <span th:if="${miaoshaStatus eq 1}">秒杀进行中</span>
+                <span th:if="${miaoshaStatus eq 2}">秒杀已经结束</span>
             </td>
             <td>
                 <form id="miaoshaForm" method="post" action="/miaosha/do_miaosha">
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                    <input type="hidden" name="goodsId" th:value="${goods.id}" />
+                    <input type="hidden" name="goodsId" th:value="${goods.id}"/>
                 </form>
             </td>
         </tr>
         <tr>
-            <td >商品原价</td>
+            <td>商品原价</td>
             <td colspan="3" th:text="${goods.goodsPrice}"></td>
         </tr>
         <tr>
-            <td >秒杀价</td>
+            <td>秒杀价</td>
             <td colspan="3" th:text="${goods.miaoshaPrice}"></td>
         </tr>
         <tr>
-            <td >库存数量</td>
+            <td>库存数量</td>
             <td colspan="3" th:text="${goods.stockCount}"></td>
         </tr>
     </table>
 </div>
-
-
 </body>
+
+<script>
+    <!--    在这里处理一下倒计时-->
+    $(function () {
+        countDown();
+    })
+
+    function countDown() {
+        var remainSeconds = $("#remainSeconds").val();
+        var timeout;
+        if (remainSeconds > 0) {
+            //说明秒杀活动未开始，进行倒计时
+            $("#buyButton").attr("disabled", true);//使得按钮失效
+            // 下面是倒计时功能，按钮显示的数值为时间减一
+            timeout = setTimeout(function () {
+                $("#countDown").text(remainSeconds - 1);
+                $("#remainSeconds").val(remainSeconds - 1);//和上面的数值同步
+                countDown();//再次调用，上面的是在修改数值
+            }, 1000);//1秒之后进行函数的回调
+
+        } else if (remainSeconds == 0) {
+            //秒杀进行中
+            $("#buyButton").attr("disabled", false);
+            if (timeout) {
+                clearTimeout(timeout);//清除timeout
+            }
+
+            $("#miaoshaTip").html("秒杀进行中");
+        } else {
+            //秒杀已经结束
+            $("#buyButton").attr("disabled", true);
+            $("#miaoshaTip").html("秒杀已经结束");
+
+        }
+
+    }
+
+</script>
 </html>
