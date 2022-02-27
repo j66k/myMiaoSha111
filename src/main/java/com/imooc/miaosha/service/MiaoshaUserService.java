@@ -49,7 +49,7 @@ public class MiaoshaUserService {
         String formPass = loginVo.getPassword();
         //判断手机号是否存在
         //调用dao去数据库中查
-        MiaoShaUser user = getById(Long.parseLong(mobile));
+        MiaoShaUser user = getById(Long.parseLong(mobile));//前端传入的mobile参数
         if (user == null) {
             throw new GlobleException(CodeMsg.MOBILE_NOTEXIST) ;
         }
@@ -58,7 +58,8 @@ public class MiaoshaUserService {
         String dbPass = user.getPassword();//数据库中的密码
         String saltDB= user.getSalt();
         if(MD5Util.formPassToDBPass(formPass,saltDB).equals(dbPass)){//判断计算之后的密码和数据库中存的是不是相同
-            addCookie(response,user);//调用创建cookie的方法
+            String token = UUIDUtil.uuid();//获取一个随机的uuid
+            addCookie(response,token,user);//调用创建cookie的方法
             return true;//登录成功
         }else{
             throw new GlobleException(CodeMsg.PASSWORD_ERROR);
@@ -76,16 +77,15 @@ public class MiaoshaUserService {
         //延长有效期
         //先判断用户是否为空，不为空才延长
         if(user!=null){
-            addCookie(response,user);//生成一个新的cookie
+            addCookie(response,token,user);//生成一个新的cookie
         }
 
         return user;
     }
 
     //生成cookie的方法
-    private void addCookie(HttpServletResponse response,MiaoShaUser user){
+    private void addCookie(HttpServletResponse response,String token,MiaoShaUser user){
         //登陆成功，生成一个cookie
-        String token = UUIDUtil.uuid();//获取一个随机的uuid
         //放到redis缓存中
         redisService.set(MiaoshaUserKey.token,token,user);//前缀，key,value
         //生成cookie
