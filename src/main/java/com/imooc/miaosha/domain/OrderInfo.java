@@ -19,7 +19,8 @@ public class OrderInfo {
     private Double goodsPrice;
     private Integer orderChannel;
     private Integer status;
-
+    private Date createDate;
+    private Date payDate;
     public Long getId() {
         return id;
     }
@@ -108,6 +109,4 @@ public class OrderInfo {
         this.payDate = payDate;
     }
 
-    private Date createDate;
-    private Date payDate;
 }

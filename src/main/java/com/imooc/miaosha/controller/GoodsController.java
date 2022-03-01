@@ -7,18 +7,12 @@ import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaUserService;
 import com.imooc.miaosha.vo.GoodsVo;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.thymeleaf.util.StringUtils;
-
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -44,6 +38,7 @@ public class GoodsController {
 
     @RequestMapping("/to_list")
     public String list(Model model, MiaoShaUser user) {
+        model.addAttribute("user",user);
         //先从goodsService中获取商品列表
         List<GoodsVo> goodsList = goodsService.listCoodsVo();
         model.addAttribute("goodsList", goodsList);//往里面加
