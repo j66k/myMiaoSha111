@@ -1,8 +1,7 @@
 package com.imooc.miaosha.controller;
 
 
-import com.imooc.miaosha.domain.MiaoShaUser;
-import com.imooc.miaosha.domain.User;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaUserService;
@@ -10,7 +9,6 @@ import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
@@ -37,7 +35,7 @@ public class GoodsController {
     GoodsService goodsService;
 
     @RequestMapping("/to_list")
-    public String list(Model model, MiaoShaUser user) {
+    public String list(Model model, MiaoshaUser user) {
         model.addAttribute("user",user);
         //先从goodsService中获取商品列表
         List<GoodsVo> goodsList = goodsService.listCoodsVo();
@@ -46,7 +44,7 @@ public class GoodsController {
     }
 
     @RequestMapping("/to_detail/{goodsid}")
-    public String detail(Model model, MiaoShaUser user,
+    public String detail(Model model, MiaoshaUser user,
                          @PathVariable("goodsid") long goodsId) {
         //传入了goodsid,通过goodsService中的方法获取
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);

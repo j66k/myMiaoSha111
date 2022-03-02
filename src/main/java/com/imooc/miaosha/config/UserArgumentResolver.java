@@ -1,8 +1,7 @@
 package com.imooc.miaosha.config;
 
-import com.imooc.miaosha.domain.MiaoShaUser;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.service.MiaoshaUserService;
-import com.imooc.miaosha.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     public boolean supportsParameter(MethodParameter methodParameter) {
         //获取参数的类型
         Class<?> clazz = methodParameter.getParameterType();
-        return clazz == MiaoShaUser.class;
+        return clazz == MiaoshaUser.class;
     }
 
     @Override

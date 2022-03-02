@@ -1,8 +1,7 @@
 package com.imooc.miaosha.service;
 
-import com.imooc.miaosha.dao.GoodsDao;
 import com.imooc.miaosha.dao.OrderDao;
-import com.imooc.miaosha.domain.MiaoShaUser;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.vo.GoodsVo;
@@ -32,7 +31,7 @@ OrderDao orderDao;
 
     //生成秒杀订单
     @Transactional//事务
-    public OrderInfo createOrder(MiaoShaUser user, GoodsVo goods) {
+    public OrderInfo createOrder(MiaoshaUser user, GoodsVo goods) {
         OrderInfo orderInfo = new OrderInfo();//生成一个订单对象
         orderInfo.setCreateDate(new Date());
         orderInfo.setDeliveryAddrId(0L);

@@ -1,6 +1,6 @@
 package com.imooc.miaosha.controller;
 
-import com.imooc.miaosha.domain.MiaoShaUser;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.redis.RedisService;
@@ -13,6 +13,7 @@ import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -40,9 +41,9 @@ public class MiaoshaController {
 
     @Autowired
     MiaoshaService miaoshaService;
-
-    @RequestMapping("/do_miaosha")
-    public String miaosha(Model model, MiaoShaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
+    //优化前1000*10  1960
+    @GetMapping("/do_miaosha")
+    public String miaosha(Model model, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
         model.addAttribute(user);
         if (user == null) {
             return "login";//如果用户为空，说明没有登录，返回到登录页面

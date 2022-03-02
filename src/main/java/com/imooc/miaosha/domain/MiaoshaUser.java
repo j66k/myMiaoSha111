@@ -9,7 +9,7 @@ import java.util.Date;
  * @CreateTime: 2022/2/25 16:16
  * @Description:与数据库中的表对应的实体类
  */
-public class MiaoShaUser {
+public class MiaoshaUser {
     private Long id;
     private String nickname;
     private String password;

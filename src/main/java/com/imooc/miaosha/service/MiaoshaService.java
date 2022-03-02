@@ -1,8 +1,6 @@
 package com.imooc.miaosha.service;
 
-import com.imooc.miaosha.dao.GoodsDao;
-import com.imooc.miaosha.domain.Goods;
-import com.imooc.miaosha.domain.MiaoShaUser;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,7 @@ public class MiaoshaService {
     OrderService orderService;
 
     @Transactional//表示这是一个原子操作，可以进行回滚
-    public OrderInfo miaosha(MiaoShaUser user, GoodsVo goods) {
+    public OrderInfo miaosha(MiaoshaUser user, GoodsVo goods) {
         //1.减小库存 引入goodsService
         goodsService.reduceStock(goods);
         //2.下订单
