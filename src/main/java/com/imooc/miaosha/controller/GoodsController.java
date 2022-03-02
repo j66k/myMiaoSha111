@@ -2,15 +2,26 @@ package com.imooc.miaosha.controller;
 
 
 import com.imooc.miaosha.domain.MiaoshaUser;
+import com.imooc.miaosha.redis.GoodsKey;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaUserService;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.spring4.context.SpringWebContext;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import javax.validation.constraints.AssertFalse;
 import java.util.List;
 
 /**
@@ -27,6 +38,10 @@ public class GoodsController {
 //    private static Logger log = LoggerFactory.getLogger(GoodsController.class);
 
     @Autowired
+    ApplicationContext applicationContext;
+    @Autowired
+    ThymeleafViewResolver thymeleafViewResolver;
+    @Autowired
     MiaoshaUserService userService;
     @Autowired
     RedisService redisService;
@@ -34,13 +49,32 @@ public class GoodsController {
     @Autowired
     GoodsService goodsService;
 
-    @RequestMapping("/to_list")
-    public String list(Model model, MiaoshaUser user) {
+    @RequestMapping(value = "/to_list",produces = "text/html")
+    @ResponseBody
+    public String list(HttpServletRequest request, HttpServletResponse response,Model model, MiaoshaUser user) {
         model.addAttribute("user",user);
         //先从goodsService中获取商品列表
         List<GoodsVo> goodsList = goodsService.listCoodsVo();
         model.addAttribute("goodsList", goodsList);//往里面加
-        return "goods_list";//返回页面
+        //return "goods_list";//返回页面
+        //1.从缓存中取
+       String html =  redisService.get(GoodsKey.getGoodsList,"",String.class);
+       //如果不为空，直接返回
+       if(!StringUtils.isEmpty(html)){
+           return html;
+       }
+       //2.如果为空，手动渲染
+        SpringWebContext ctx = new SpringWebContext(request,response,
+                request.getServletContext(),request.getLocale(),model.asMap(),applicationContext);
+       //手动渲染
+       html =  thymeleafViewResolver.getTemplateEngine().process("goods_list",ctx);
+       //需要两个参数一个是需要渲染的模板名称，一个是上下文
+        if(!StringUtils.isEmpty(html)){
+            //渲染完之后存到redis中
+            redisService.set(GoodsKey.getGoodsList,"",html);
+        }
+        //返回渲染后的页面
+        return html;
     }
 
     @RequestMapping("/to_detail/{goodsid}")
