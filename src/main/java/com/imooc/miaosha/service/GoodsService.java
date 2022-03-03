@@ -24,7 +24,7 @@ public class GoodsService {
     GoodsDao goodsDao;
 
     //查出所有的商品列表
-    public List<GoodsVo> listCoodsVo(){
+    public List<GoodsVo> listGoodsVo(){
         return goodsDao.listGoodsVo();
     }
 

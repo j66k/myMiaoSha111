@@ -12,6 +12,9 @@ public class Goods {
     private String goodsName;
     private String goodsTitle;
     private String goodsImg;
+    private String goodsDetail;
+    private Double goodsPrice;
+    private Integer goodsStock;
 
     public Long getId() {
         return id;
@@ -69,7 +72,5 @@ public class Goods {
         this.goodsStock = goodsStock;
     }
 
-    private String goodsDetail;
-    private Double goodsPrice;
-    private Integer goodsStock;
+
 }

@@ -43,6 +43,7 @@ public class LoginController {
 
         log.info(loginVo.toString());
        String token = miaoshaUserService.login(response,loginVo);
+       log.info(token);
         return Result.success(token);
     }
 
