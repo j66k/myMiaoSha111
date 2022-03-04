@@ -53,6 +53,10 @@ public class UserUtil {
 //		conn.close();
 //		System.out.println("insert to db");
 		//登录，生成token
+
+
+
+
 		String urlString = "http://localhost:8080/login/do_login";
 		File file = new File("D:/tokens.txt");
 		if(file.exists()) {
@@ -92,7 +96,7 @@ public class UserUtil {
 			System.out.println("write to file : " + user.getId());
 		}
 		raf.close();
-		
+
 		System.out.println("over");
 	}
 	

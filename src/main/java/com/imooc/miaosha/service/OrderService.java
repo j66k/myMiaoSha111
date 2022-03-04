@@ -4,6 +4,8 @@ import com.imooc.miaosha.dao.OrderDao;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.OrderInfo;
+import com.imooc.miaosha.redis.OrderKey;
+import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,20 @@ import java.util.Date;
 public class OrderService {
 @Autowired
 OrderDao orderDao;
+@Autowired
+RedisService redisService;
     //通过用户id以及商品id来查询秒杀的订单
     public MiaoshaOrder getMiaoshaOrderByUserIdGoodsId(Long userId, long goodsId) {
+    //这里优化一下，查看订单的时候不去数据库查，而是直接去查缓存
+        //return orderDao.getMiaoshaOrderByUserIdGoodsId(userId,goodsId);
+       return redisService.get(OrderKey.getMiaoshaOrderByUidGid,""+userId+"_"+goodsId,MiaoshaOrder.class);
+    }
 
-        return orderDao.getMiaoshaOrderByUserIdGoodsId(userId,goodsId);
+
+    //通过订单的id来获取普通订单
+    public OrderInfo getOrderById(long orderId) {
+
+        return orderDao.getOrderById(orderId);
     }
 
     //生成秒杀订单
@@ -54,7 +66,10 @@ OrderDao orderDao;
 
         //调用dao中插入秒杀订单的方法
         orderDao.insertMiaoshaOrder(miaoshaOrder);
-
+        //把订单写入到redis中
+        redisService.set(OrderKey.getMiaoshaOrderByUidGid,""+user.getId()+"_"+goods.getId(),miaoshaOrder);//把miaosahorder这个对象放进去
         return orderInfo;
     }
+
+
 }

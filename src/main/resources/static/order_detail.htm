@@ -41,11 +41,6 @@
         <tr>
             <td>订单状态</td>
             <td id="orderStatus">
-<!--                <span if="${orderInfo.status eq 0}">未支付</span>-->
-<!--                <span if="${orderInfo.status eq 1}">待发货</span>-->
-<!--                <span if="${orderInfo.status eq 3}">已收货</span>-->
-<!--                <span if="${orderInfo.status eq 4}">已退款</span>-->
-<!--                <span if="${orderInfo.status eq 5}">已完成</span>-->
             </td>
             <td>
                 <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
@@ -63,4 +58,62 @@
 </div>
 
 </body>
+<script>
+
+    function render(detail){
+
+        var goods = detail.goods;
+        var order = detail.order;
+        $("goodsName").text(goods.goodsName);
+        $("goodsImg").attr("src",goods.goodsImg);
+        $("orderPrice").text(order.goodsPrice);
+        $("createDate").text(new Date(order.createDate).format("yyyy-MM-dd hh:mm:ss"));
+        var status = "";
+        if(order.status == 0){
+            status = "未支付";
+        }else if(order.status == 1){
+            status = "待发货";
+        }else if(order.status == 3){
+            status = "已收货";
+        }else if(order.status == 4){
+            status = "已退款";
+        }else if(order.status == 5){
+            status = "已完成";
+        }
+        $("orderStatus").text(status);
+
+    }
+
+    $(function (){
+        getOrderDetail();
+    })
+
+    function getOrderDetail(){
+        var orderId = g_getQueryString("orderId");
+        $.ajax({
+            url:"/order/detail",
+            type: "GET",
+            data:{
+                orderId:orderId
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    //成功获取到data，进行页面的渲染
+                    render(data.data);
+
+                } else {
+                    layer.msg(data.msg);
+                }
+
+            },
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+
+
+
+</script>
+
 </html>

@@ -17,7 +17,9 @@ public interface OrderDao {
     //按照用户id和商品的id来查询秒杀的订单
     @Select("select *from miaosha_order where user_id=#{userId} and goods_id=#{goodsId}")
    public MiaoshaOrder getMiaoshaOrderByUserIdGoodsId(@Param("userId") long userId, @Param("goodsId") long goodsId);
-
+    //按照订单id取出订单
+    @Select("select *from order_info where id=#{orderId}")
+    OrderInfo getOrderById(@Param("orderId") long orderId);
     //把正常的订单插入
 
     //第二个注解是把最后插入的id返回
@@ -30,4 +32,6 @@ public interface OrderDao {
 
     @Insert("insert into miaosha_order(user_id,order_id,goods_id)values(#{userId},#{orderId},#{goodsId}) ")
    public void insertMiaoshaOrder(MiaoshaOrder miaoshaOrder);
+
+
 }

@@ -28,7 +28,7 @@ public class CodeMsg {
     //商品模块 5003XX
 
     //订单模块 5004XX
-
+    public static CodeMsg NO_ORDER = new CodeMsg(500400, "订单为空");
     //秒杀模块 5005XX
     public static CodeMsg MIAOSHA_OVER = new CodeMsg(500500, "库存不足，商品已经秒杀完毕");
     public static CodeMsg MIAOSHA_REPEAT = new CodeMsg(500501, "不能重复进行秒杀");
