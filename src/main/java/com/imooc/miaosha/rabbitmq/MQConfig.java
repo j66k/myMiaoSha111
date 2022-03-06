@@ -21,6 +21,7 @@ public class MQConfig {
 
 	/**
 	 * Direct模式 交换机Exchange
+	 * 这里使用的默认的exchange
 	 * */
 	@Bean
 	public Queue queue() {
@@ -30,59 +31,61 @@ public class MQConfig {
 	/**
 	 * Topic模式 交换机Exchange
 	 * */
-//	@Bean
-//	public Queue topicQueue1() {
-//		return new Queue(TOPIC_QUEUE1, true);
-//	}
-//	@Bean
-//	public Queue topicQueue2() {
-//		return new Queue(TOPIC_QUEUE2, true);
-//	}
-//	@Bean
-//	public TopicExchange topicExchage(){
-//		return new TopicExchange(TOPIC_EXCHANGE);
-//	}
-//	@Bean
-//	public Binding topicBinding1() {
-//		return BindingBuilder.bind(topicQueue1()).to(topicExchage()).with("topic.key1");
-//	}
-//	@Bean
-//	public Binding topicBinding2() {
-//		return BindingBuilder.bind(topicQueue2()).to(topicExchage()).with("topic.#");
-//	}
-//	/**
-//	 * Fanout模式 交换机Exchange
-//	 * */
-//	@Bean
-//	public FanoutExchange fanoutExchage(){
-//		return new FanoutExchange(FANOUT_EXCHANGE);
-//	}
-//	@Bean
-//	public Binding FanoutBinding1() {
-//		return BindingBuilder.bind(topicQueue1()).to(fanoutExchage());
-//	}
-//	@Bean
-//	public Binding FanoutBinding2() {
-//		return BindingBuilder.bind(topicQueue2()).to(fanoutExchage());
-//	}
-//	/**
-//	 * Header模式 交换机Exchange
-//	 * */
-//	@Bean
-//	public HeadersExchange headersExchage(){
-//		return new HeadersExchange(HEADERS_EXCHANGE);
-//	}
-//	@Bean
-//	public Queue headerQueue1() {
-//		return new Queue(HEADER_QUEUE, true);
-//	}
-//	@Bean
-//	public Binding headerBinding() {
-//		Map<String, Object> map = new HashMap<String, Object>();
-//		map.put("header1", "value1");
-//		map.put("header2", "value2");
-//		return BindingBuilder.bind(headerQueue1()).to(headersExchage()).whereAll(map).match();
-//	}
+	@Bean
+	public Queue topicQueue1() {
+		return new Queue(TOPIC_QUEUE1, true);
+	}
+	@Bean
+	public Queue topicQueue2() {
+		return new Queue(TOPIC_QUEUE2, true);
+	}
+	//自己创建的交换机
+	@Bean
+	public TopicExchange topicExchage(){
+		return new TopicExchange(TOPIC_EXCHANGE);//spring框架里面的amqp
+	}
+	//用来绑定
+	@Bean
+	public Binding topicBinding1() {
+		return BindingBuilder.bind(topicQueue1()).to(topicExchage()).with("topic.key1");
+	}
+	@Bean
+	public Binding topicBinding2() {
+		return BindingBuilder.bind(topicQueue2()).to(topicExchage()).with("topic.#");//通配符
+	}
+	/**
+	 * Fanout模式 交换机Exchange
+	 * */
+	@Bean
+	public FanoutExchange fanoutExchage(){
+		return new FanoutExchange(FANOUT_EXCHANGE);
+	}
+	@Bean
+	public Binding FanoutBinding1() {
+		return BindingBuilder.bind(topicQueue1()).to(fanoutExchage());
+	}
+	@Bean
+	public Binding FanoutBinding2() {
+		return BindingBuilder.bind(topicQueue2()).to(fanoutExchage());
+	}
+	/**
+	 * Header模式 交换机Exchange
+	 * */
+	@Bean
+	public HeadersExchange headersExchage(){
+		return new HeadersExchange(HEADERS_EXCHANGE);
+	}
+	@Bean
+	public Queue headerQueue1() {
+		return new Queue(HEADER_QUEUE, true);
+	}
+	@Bean
+	public Binding headerBinding() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("header1", "value1");
+		map.put("header2", "value2");
+		return BindingBuilder.bind(headerQueue1()).to(headersExchage()).whereAll(map).match();
+	}
 
 
 }

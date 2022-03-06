@@ -26,27 +26,27 @@ public class SampleController {
 	@Autowired
 	MQSender sender;
 	
-//	@RequestMapping("/mq/header")
-//    @ResponseBody
-//    public Result<String> header() {
-//		sender.sendHeader("hello,imooc");
-//        return Result.success("Hello，world");
-//    }
-//	
-//	@RequestMapping("/mq/fanout")
-//    @ResponseBody
-//    public Result<String> fanout() {
-//		sender.sendFanout("hello,imooc");
-//        return Result.success("Hello，world");
-//    }
-//	
-//	@RequestMapping("/mq/topic")
-//    @ResponseBody
-//    public Result<String> topic() {
-//		sender.sendTopic("hello,imooc");
-//        return Result.success("Hello，world");
-//    }
-//	
+	@RequestMapping("/mq/header")
+    @ResponseBody
+    public Result<String> header() {
+		sender.sendHeader("hello,imooc");
+        return Result.success("Hello，world");
+    }
+
+	@RequestMapping("/mq/fanout")
+    @ResponseBody
+    public Result<String> fanout() {
+		sender.sendFanout("hello,imooc fanout");
+        return Result.success("Hello，fanout");
+    }
+
+	@RequestMapping("/mq/topic")
+    @ResponseBody
+    public Result<String> topic() {
+		sender.sendTopic("hello,imooc topic");
+        return Result.success("Hello，world");
+    }
+
 	@RequestMapping("/mq")
     @ResponseBody
     public Result<String> mq() {
