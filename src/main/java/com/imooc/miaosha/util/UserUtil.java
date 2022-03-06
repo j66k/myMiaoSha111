@@ -34,6 +34,8 @@ public class UserUtil {
 			users.add(user);
 		}
 		System.out.println("create user");
+		//第一步开始
+
 //		//插入数据库
 //		Connection conn = DBUtil.getConn();
 //		String sql = "insert into miaosha_user(login_count, nickname, register_date, salt, password, id)values(?,?,?,?,?,?)";
@@ -52,11 +54,12 @@ public class UserUtil {
 //		pstmt.close();
 //		conn.close();
 //		System.out.println("insert to db");
-		//登录，生成token
 
+//第一步结束
 
+//登录，生成token
 
-
+		//第二步开始
 		String urlString = "http://localhost:8080/login/do_login";
 		File file = new File("D:/tokens.txt");
 		if(file.exists()) {
@@ -97,6 +100,7 @@ public class UserUtil {
 		}
 		raf.close();
 
+		//第二步结束
 		System.out.println("over");
 	}
 	

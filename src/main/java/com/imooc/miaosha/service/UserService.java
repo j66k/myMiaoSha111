@@ -26,17 +26,32 @@ public class UserService {
     }
 
     //把底下放在一个事务中，如果出错，就会回滚这个事务
-    //Transactional
-    public boolean tx(User user) {
-        User user1 = new User();
-        user1.setId(2);
-        user1.setName("222");
-        userDao.insert(user1);
+//    //Transactional
+//    public boolean tx(User user) {
+//        User user1 = new User();
+//        user1.setId(2);
+//        user1.setName("222");
+//        userDao.insert(user1);
+//
+//        User user2 = new User();
+//        user2.setId(1);
+//        user2.setName("112");
+//        userDao.insert(user2);
+//
+//        return true;
+//    }
 
-        User user2 = new User();
-        user2.setId(1);
-        user2.setName("112");
-        userDao.insert(user2);
+    @Transactional
+    public boolean tx() {
+        User u1= new User();
+        u1.setId(2);
+        u1.setName("2222");
+        userDao.insert(u1);
+
+        User u2= new User();
+        u2.setId(1);
+        u2.setName("11111");
+        userDao.insert(u2);
 
         return true;
     }
