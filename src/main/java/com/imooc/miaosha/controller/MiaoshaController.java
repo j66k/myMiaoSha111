@@ -23,6 +23,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,15 +183,66 @@ public class MiaoshaController implements InitializingBean {
     }
 
 
-    @RequestMapping(value = "/path",method = RequestMethod.GET)
+//    @RequestMapping(value = "/path",method = RequestMethod.GET)
+//    @ResponseBody
+//    public Result<String> getMiaoshaPath(Model model, MiaoshaUser user,
+//                                         @RequestParam("goodsId") long goodsId,
+//                                         @RequestParam("VerifyCode")int verifyCode
+//                                         ) {//这里是从request中获取id
+//        model.addAttribute(user);
+//        if (user == null) {
+//            return Result.error(CodeMsg.SESSION_ERROR);//如果用户为空，说明没有登录，返回到登录页面
+//        }
+//        //校验验证码
+//        boolean check = miaoshaService.checkVerifyCode(user,goodsId,verifyCode);
+//        if(!check){
+//            return Result.error(CodeMsg.REQUEST_ILLEGAL);//返回非法请求
+//        }
+//
+//        //调用service中的方法生成地址
+//       String path =  miaoshaService.createMiaoshaPath(user,goodsId);
+//        return Result.success(path);
+//    }
+
+
+    @RequestMapping(value="/path", method=RequestMethod.GET)
     @ResponseBody
-    public Result<String> getMiaoshaPath(Model model, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
-        model.addAttribute(user);
+    public Result<String> getMiaoshaPath(HttpServletRequest request, MiaoshaUser user,
+                                         @RequestParam("goodsId")long goodsId,
+                                         @RequestParam(value="verifyCode", defaultValue="0")int verifyCode
+    ) {
+        if(user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
+        if(!check) {
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        }
+        String path  =miaoshaService.createMiaoshaPath(user, goodsId);
+        return Result.success(path);
+    }
+
+
+
+    //下面的方法生成验证码用
+    @RequestMapping(value = "/verifyCode",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaVerifyCode(HttpServletResponse response, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);//如果用户为空，说明没有登录，返回到登录页面
         }
-        //调用service中的方法生成地址
-       String path =  miaoshaService.createMiaoshaPath(user,goodsId);
-        return Result.success(path);
+
+        BufferedImage image = miaoshaService.createVerifyCode(user,goodsId);
+        try{
+           OutputStream out =  response.getOutputStream();
+            ImageIO.write(image,"JPEG",out);//把前面的图片用jpeg格式放到out中
+            out.flush();//清空输出流
+            out.close();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.error(CodeMsg.MIAOSHA_FAIL);
+        }
+
     }
 }

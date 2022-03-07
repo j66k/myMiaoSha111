@@ -42,11 +42,15 @@
                 <span id="miaoshaTip"></span>
             </td>
             <td>
-<!--                <form id="miaoshaForm" method="post" action="/miaosha/do_miaosha">-->
-<!--                    <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>-->
-<!--                    <input type="hidden" name="goodsId" id="goodsId"/>-->
-<!--                </form>-->
-                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="getMiaoshaPath()">立即秒杀</button>-->
+                <div class="row">
+                    <div class="form-inline">
+                    <img id="verifyCodeImg" width="80" height="32" style="display:none" onclick="refreshVerifyCode()"/>
+                    <input id="verifyCode" class="form-control"  style="display:none"/>
+                    <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="getMiaoshaPath()">
+                        立即秒杀
+                    </button>
+                    </div>
+                </div>
                 <input type="hidden" name="goodsId" id="goodsId"/>
             </td>
         </tr>
@@ -68,15 +72,16 @@
 
 <script>
 
-    function getMiaoshaPath(){
+    function getMiaoshaPath() {
 
         var goodId = $("#goodsId").val();
-            g_showLoading();//加载中
+        g_showLoading();//加载中
         $.ajax({
-            url:"/miaosha/path",
+            url: "/miaosha/path",
             type: "GET",
-            data:{
-                goodsId:goodId,
+            data: {
+                goodsId: goodId,
+                verifyCode:$("#verifyCode").val()
             },
             success: function (data) {
                 if (data.code == 0) {
@@ -94,34 +99,33 @@
     }
 
 
-
-    function  getMiaoshaResult(goodsId){
+    function getMiaoshaResult(goodsId) {
 
         g_showLoading();//加载中
         $.ajax({
-            url:"/miaosha/result",
+            url: "/miaosha/result",
             type: "GET",
-            data:{
-                goodsId:$("#goodsId").val(),
+            data: {
+                goodsId: $("#goodsId").val(),
             },
             success: function (data) {
                 if (data.code == 0) {
                     //后端返回0，代表的是在排队中，下面进行客户端的轮询
                     var result = data.data;
-                    if(result<0){
+                    if (result < 0) {
                         layer.msg("很遗憾，秒杀失败");
-                    }else if(result==0){
-                       //进行轮询
-                        setTimeout(function (){
+                    } else if (result == 0) {
+                        //进行轮询
+                        setTimeout(function () {
                             getMiaoshaResult(goodsId);
-                        },200);//50mm之后再次轮询
-                    }else {
-                        layer.confirm("恭喜你，秒杀成功!查看订单？",{btn:["确定","取消"]},
-                        function (){
-                        window.location.href="/order_detail.htm?orderId="+result;
-                        },
-                            function (){
-                        //关掉弹窗
+                        }, 200);//50mm之后再次轮询
+                    } else {
+                        layer.confirm("恭喜你，秒杀成功!查看订单？", {btn: ["确定", "取消"]},
+                            function () {
+                                window.location.href = "/order_detail.htm?orderId=" + result;
+                            },
+                            function () {
+                                //关掉弹窗
                                 layer.closeAll();
                             }
                         );
@@ -139,18 +143,18 @@
 
     }
 
-    function doMiaosha(path){
+    function doMiaosha(path) {
 
         $.ajax({
-            url:"/miaosha/"+path+"/do_miaosha",
+            url: "/miaosha/" + path + "/do_miaosha",
             type: "POST",
-            data:{
-                goodsId:$("#goodsId").val()
+            data: {
+                goodsId: $("#goodsId").val()
             },
             success: function (data) {
                 if (data.code == 0) {
                     //说明秒杀到了，跳转
-                  //  window.location.href = "/order_detail.htm?orderId="+data.data.id;
+                    //  window.location.href = "/order_detail.htm?orderId="+data.data.id;
                     //后端返回0，代表的是在排队中，下面进行客户端的轮询
                     getMiaoshaResult($("#goodsId").val());
 
@@ -179,7 +183,7 @@
         }
         //下面填充页面的数据
         $("#goodsName").text(goods.goodsName);
-        $("#goodsImg").attr("src",goods.goodsImg);
+        $("#goodsImg").attr("src", goods.goodsImg);
         $("#startTime").text(new Date(goods.startDate).format("yyyy-MM-dd hh:mm:ss"));
         $("#remainSeconds").val(remainSeconds);
         $("#goodsId").val(goods.id);
@@ -227,7 +231,7 @@
         if (remainSeconds > 0) {
             //说明秒杀活动未开始，进行倒计时
             $("#buyButton").attr("disabled", true);//使得按钮失效
-            $("#miaoshaTip").html("秒杀倒计时"+ remainSeconds+"秒");
+            $("#miaoshaTip").html("秒杀倒计时" + remainSeconds + "秒");
             // 下面是倒计时功能，按钮显示的数值为时间减一
             timeout = setTimeout(function () {
                 $("#countDown").text(remainSeconds - 1);
@@ -243,29 +247,29 @@
             }
 
             $("#miaoshaTip").html("秒杀进行中");
+            //生成验证码
+            $("#verifyCodeImg").attr("src","/miaosha/verifyCode?goodsId="+$("#goodsId").val());
+            $("#verifyCodeImg").show();//进行展示
+            $("#verifyCode").show();
+
         } else {
             //秒杀已经结束
             $("#buyButton").attr("disabled", true);
             $("#miaoshaTip").html("秒杀已经结束");
+            //隐藏验证码
+            $("#verifyCodeImg").hide();//进行展示
+            $("#verifyCode").hide();
 
         }
 
     }
+    //刷新验证码
+    function refreshVerifyCode(){
+        $("#verifyCodeImg").attr("src", "/miaosha/verifyCode?goodsId="+$("#goodsId").val()+"&timestamp="+new Date().getTime());
+    }
 
 </script>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <!--<!DOCTYPE HTML>-->
