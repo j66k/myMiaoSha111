@@ -2,6 +2,7 @@ package com.imooc.miaosha.rabbitmq;
 
 import com.imooc.miaosha.domain.MiaoshaUser;
 
+//封装秒杀消息的类
 public class MiaoshaMessage {
 	private MiaoshaUser user;
 	private long goodsId;

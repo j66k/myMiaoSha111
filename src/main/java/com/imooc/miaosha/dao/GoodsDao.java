@@ -32,5 +32,5 @@ public interface GoodsDao {
 
     //修改库存信息
     @Update("update miaosha_goods set stock_count=stock_count-1 where goods_id=#{goodsId} and stock_count >0")//从对象中取出名称为goodsId的值
-    void reduceStock(MiaoshaGoods g);
+    int reduceStock(MiaoshaGoods g);
 }

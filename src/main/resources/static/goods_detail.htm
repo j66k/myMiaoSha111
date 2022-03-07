@@ -68,6 +68,50 @@
 
 <script>
 
+    function  getMiaoshaResult(goodsId){
+
+        g_showLoading();//加载中
+        $.ajax({
+            url:"/miaosha/result",
+            type: "GET",
+            data:{
+                goodsId:$("#goodsId").val(),
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    //后端返回0，代表的是在排队中，下面进行客户端的轮询
+                    var result = data.data;
+                    if(result<0){
+                        layer.msg("很遗憾，秒杀失败");
+                    }else if(result==0){
+                       //进行轮询
+                        setTimeout(function (){
+                            getMiaoshaResult(goodsId);
+                        },50);//50mm之后再次轮询
+                    }else {
+                        layer.confirm("恭喜你，秒杀成功!查看订单？",{btn:["确定","取消"]},
+                        function (){
+                        window.location.href="/order_detail.htm?orderId="+result;
+                        },
+                            function (){
+                        //关掉弹窗
+                                layer.closeAll();
+                            }
+                        );
+                    }
+
+                } else {
+                    layer.msg(data.msg);
+                }
+
+            },
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+
+    }
+
     function doMiaosha(){
 
         $.ajax({
@@ -79,7 +123,9 @@
             success: function (data) {
                 if (data.code == 0) {
                     //说明秒杀到了，跳转
-                    window.location.href = "/order_detail.htm?orderId="+data.data.id;
+                  //  window.location.href = "/order_detail.htm?orderId="+data.data.id;
+                    //后端返回0，代表的是在排队中，下面进行客户端的轮询
+                    getMiaoshaResult($("#goodsId").val());
 
                 } else {
                     layer.msg(data.msg);

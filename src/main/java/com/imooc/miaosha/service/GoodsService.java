@@ -24,7 +24,7 @@ public class GoodsService {
     GoodsDao goodsDao;
 
     //查出所有的商品列表
-    public List<GoodsVo> listGoodsVo(){
+    public List<GoodsVo> listGoodsVo() {
         return goodsDao.listGoodsVo();
     }
 
@@ -34,10 +34,10 @@ public class GoodsService {
     }
 
     //减小库存的方法
-    public void reduceStock(GoodsVo goods) {
+    public boolean reduceStock(GoodsVo goods) {
         MiaoshaGoods g = new MiaoshaGoods();
         g.setGoodsId(goods.getId());
-        goodsDao.reduceStock(g);//调用dao中的方法修改库存，传入商品对象
-
+        int ret = goodsDao.reduceStock(g);//调用dao中的方法修改库存，传入商品对象
+        return ret > 0;//判断是否减库存成功
     }
 }
