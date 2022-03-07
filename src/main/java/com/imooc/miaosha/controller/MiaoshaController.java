@@ -1,10 +1,12 @@
 package com.imooc.miaosha.controller;
 
+import com.imooc.miaosha.access.AccessLimit;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.rabbitmq.MQSender;
 import com.imooc.miaosha.rabbitmq.MiaoshaMessage;
+import com.imooc.miaosha.redis.AccessKey;
 import com.imooc.miaosha.redis.GoodsKey;
 import com.imooc.miaosha.redis.MiaoshaKey;
 import com.imooc.miaosha.redis.RedisService;
@@ -167,6 +169,7 @@ public class MiaoshaController implements InitializingBean {
      * 失败返回-1
      * 0表示还在排队中
      */
+    @AccessLimit(seconds=5,maxCount=10,needLogin=true)//自定义的注解，来做拦截器
     @RequestMapping(value = "/result", method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> miaoshaResult(Model model, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
@@ -204,7 +207,7 @@ public class MiaoshaController implements InitializingBean {
 //        return Result.success(path);
 //    }
 
-
+    @AccessLimit(seconds=5,maxCount=5,needLogin=true)//自定义的注解，来做拦截器
     @RequestMapping(value="/path", method=RequestMethod.GET)
     @ResponseBody
     public Result<String> getMiaoshaPath(HttpServletRequest request, MiaoshaUser user,
@@ -214,6 +217,22 @@ public class MiaoshaController implements InitializingBean {
         if(user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+//        //做一个限流防刷  这里的功能通过注解实现了
+//        //查询访问的次数
+//       String uri =  request.getRequestURI();
+//        String key = uri+"_"+user.getId();
+//       Integer count =  redisService.get(AccessKey.access,key,Integer.class);
+//       if(count==null){
+//           //没有进行过访问
+//           redisService.set(AccessKey.access,key,1);
+//       }else if(count<5){
+//           redisService.incr(AccessKey.access,key);
+//       }else{
+//           return Result.error(CodeMsg.REQUEST_TOMUCH);
+//       }
+
+
+
         boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
         if(!check) {
             return Result.error(CodeMsg.REQUEST_ILLEGAL);

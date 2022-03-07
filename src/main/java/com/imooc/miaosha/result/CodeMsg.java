@@ -17,6 +17,9 @@ public class CodeMsg {
     public static CodeMsg SERVER_ERROR = new CodeMsg(500100, "服务端异常");
     public static CodeMsg BIND_ERROR = new CodeMsg(500101, "参数校验异常:%s");
     public static CodeMsg REQUEST_ILLEGAL = new CodeMsg(500102, "请求非法");
+    public static CodeMsg REQUEST_TOMUCH = new CodeMsg(500103, "访问过于频繁");
+
+
     //登录模块 5002XX
 
     public static CodeMsg PASSWORD_EMPTY = new CodeMsg(500211, "密码不能为空");
