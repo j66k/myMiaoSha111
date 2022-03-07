@@ -6,6 +6,7 @@ import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.rabbitmq.MQSender;
 import com.imooc.miaosha.rabbitmq.MiaoshaMessage;
 import com.imooc.miaosha.redis.GoodsKey;
+import com.imooc.miaosha.redis.MiaoshaKey;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
@@ -13,6 +14,8 @@ import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaService;
 import com.imooc.miaosha.service.MiaoshaUserService;
 import com.imooc.miaosha.service.OrderService;
+import com.imooc.miaosha.util.MD5Util;
+import com.imooc.miaosha.util.UUIDUtil;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,12 +76,22 @@ public class MiaoshaController implements InitializingBean {
     }
 
 
-    @RequestMapping(value = "/do_miaosha", method = RequestMethod.POST)
+
+
+    @RequestMapping(value = "/{path}/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
-    public Result<Integer> miaosha(Model model, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
+    public Result<Integer> miaosha(Model model, MiaoshaUser user,
+                                   @RequestParam("goodsId") long goodsId,
+                                   @PathVariable("path") String path
+                                    ) {//这里是从request中获取id
         model.addAttribute(user);
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);//如果用户为空，说明没有登录，返回到登录页面
+        }
+        //收到请求之后，先验证这个path
+       boolean check =  miaoshaService.checkPath(user,goodsId,path);
+        if(!check){
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);//地址错误，直接停止
         }
 
         //先从map中取 判断商品是否为空
@@ -160,5 +173,18 @@ public class MiaoshaController implements InitializingBean {
         //如果还没处理完，则返回0，客户端会继续轮询
         return Result.success(result);
 
+    }
+
+
+    @RequestMapping(value = "/path",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaPath(Model model, MiaoshaUser user, @RequestParam("goodsId") long goodsId) {//这里是从request中获取id
+        model.addAttribute(user);
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);//如果用户为空，说明没有登录，返回到登录页面
+        }
+        //调用service中的方法生成地址
+       String path =  miaoshaService.createMiaoshaPath(user,goodsId);
+        return Result.success(path);
     }
 }

@@ -7,6 +7,8 @@ import com.imooc.miaosha.redis.MiaoshaKey;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
+import com.imooc.miaosha.util.MD5Util;
+import com.imooc.miaosha.util.UUIDUtil;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,5 +79,27 @@ public class MiaoshaService {
 
     private boolean getGoodsOver(long goodsId) {
        return redisService.exists(MiaoshaKey.isGoodsOver,""+goodsId);//有这个key说明卖完了
+    }
+
+
+    //创建地址
+    public String createMiaoshaPath(MiaoshaUser user, long goodsId) {
+        //生成一个随机的串
+        //然后进行一次md5编码
+        String str = MD5Util.md5(UUIDUtil.uuid()+"123456");
+        //然后存到redis中
+        redisService.set(MiaoshaKey.getMiaoshaPath,""+user.getId()+"_"+goodsId,str);
+        return str;
+    }
+
+    //验证传入的地址的合法性
+    public boolean checkPath(MiaoshaUser user, long goodsId, String path) {
+        if(user==null||path==null){
+            return false;
+        }
+        //先从redis中取出对应的数据
+      String pathOld =   redisService.get(MiaoshaKey.getMiaoshaPath,""+user.getId()+"_"+goodsId,String.class);
+        //对比是否相同
+        return path.equals(pathOld);
     }
 }
